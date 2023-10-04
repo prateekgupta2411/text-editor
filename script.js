@@ -1,35 +1,29 @@
+// Function to format text content or apply formatting to selected text
 function formatDoc(cmd, value = null) {
-    const selection = window.getSelection();
-
-    if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const text = range.toString();
-
-        if (value) {
-            const headingElement = document.createElement(value);
-            headingElement.innerHTML = text;
-            headingElement.style.display = 'inline-block';
-            range.deleteContents();
-            range.insertNode(headingElement);
-        } else {
-            const span = document.createElement('span');
-            span.textContent = text;
-            const format = {
-                bold: 'font-weight: bold;',
-                underline: 'text-decoration: underline;',
-                italic: 'font-style: italic;',
-            }[cmd];
-
-            if (format) {
-                span.style.cssText = format;
-            }
-
-            range.deleteContents();
-            range.insertNode(span);
+    if (value) {
+        // Check if there is a selected text range
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const span = document.createElement(value); // Create an element based on the chosen format
+            span.textContent = range.toString(); // Set the content of the element
+            span.style.display = 'inline-block';
+            range.deleteContents(); // Delete the selected text
+            range.insertNode(span); // Insert the new element with the chosen format
         }
+    } else {
+        document.execCommand(cmd); // Execute the specified command (e.g., bold, italic)
     }
 }
 
+// Add an event listener to the select element for choosing text formatting
+const selectFormat = document.querySelector('select');
+selectFormat.addEventListener('change', function () {
+    const selectedFormat = selectFormat.value;
+    formatDoc('formatBlock', selectedFormat); // Call the formatDoc function with the chosen format
+});
+
+// Toggle between rich text editor and code view
 const content = document.getElementById("content");
 const showCode = document.getElementById("show-code");
 let active = false;
@@ -46,6 +40,7 @@ showCode.addEventListener("click", function () {
     }
 });
 
+// Function to toggle between rich text editor and HTML code view
 function toggleHtmlView() {
     const content = document.getElementById("content");
     const showCode = document.getElementById("show-code");
@@ -64,6 +59,3 @@ function toggleHtmlView() {
         content.style.display = "block";
     }
 }
-
-
-
